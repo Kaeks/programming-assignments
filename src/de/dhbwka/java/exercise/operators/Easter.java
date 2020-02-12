@@ -15,7 +15,7 @@ public class Easter {
         scanner.close();
     }
 
-    private int calculate(int year) {
+    int calculate(int year) {
         int a = year % 19;
         int b = year % 4;
         int c = year % 7;
@@ -29,14 +29,14 @@ public class Easter {
         return (22 + d + e);
     }
 
-    private String parseDay(int day) {
+    String parseDay(int day) {
         int realDay = day > 31 ? day - 31 : day;
         String month =  day > 31 ? "April" : "March";
         String blubb = "th'st'rd";
         return realDay + blubb + " of " + month;
     }
 
-    private String parseMessage(int year) {
+    String parseMessage(int year) {
         int day = calculate(year);
         return "The year " + year + "'s easter will be on the " + parseDay(day) + ".";
     }

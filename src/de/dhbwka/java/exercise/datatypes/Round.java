@@ -34,11 +34,11 @@ public class Round {
         System.out.println(r.betterRound(nE));
     }
 
-    private int round(double value) {
+    int round(double value) {
         return (int) (value + 0.5);
     }
 
-    private int betterRound(double value) {
+    int betterRound(double value) {
         return (int) (value + (value >= 0 ? + 0.5 : - 0.5));
     }
 }
