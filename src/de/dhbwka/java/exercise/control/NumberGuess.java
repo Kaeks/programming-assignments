@@ -12,24 +12,25 @@ public class NumberGuess {
         while (!exit) {
             int randomNumber = (int) (Math.random() * 100 + 1);
             int guessedNumber = -1;
-            int tries = 0;
+            int attempts = 0;
 
             while (guessedNumber != randomNumber) {
                 System.out.printf("%s, guess a number [1-100]: ", name);
                 guessedNumber = scan.nextInt();
-                tries++;
+                attempts++;
                 String s = guessedNumber > randomNumber ? "too high" : guessedNumber < randomNumber ? "too low" : "correct";
-                System.out.printf("Attempt #%d: %d is %s.%n", tries, guessedNumber, s);
+                System.out.printf("Attempt #%d: %d is %s.%n", attempts, guessedNumber, s);
             }
-            while (true) {
+            int cont = -1;
+            while (cont == -1) {
                 System.out.printf("Continue?%n0 - Yes%n1 - No%n");
-                int continueNum = scan.nextInt();
-                if (continueNum == 0) break;
-                else if (continueNum == 1) {
-                    exit = true;
-                    break;
+                cont = scan.nextInt();
+                if (cont != 0 && cont != 1) {
+                    System.out.println("Bruh.");
+                    cont = -1;
                 }
             }
+            if (cont == 1) exit = true;
         }
         scan.close();
     }

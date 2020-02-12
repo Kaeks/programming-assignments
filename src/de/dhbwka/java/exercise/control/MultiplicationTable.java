@@ -6,17 +6,9 @@ public class MultiplicationTable {
             String line = "";
             for (int j = 1; j <= 10; j++) {
                 int result = i * j;
-                line += pad(result, 3);
+                line += String.format("%3d", result);
             }
             System.out.println(line);
         }
-    }
-
-    static String pad(int num, int len) {
-        String s = "";
-        for (int i = 0; i < len - Math.floor(Math.log10(num)); i++) {
-            s += " ";
-        }
-        return s + num;
     }
 }

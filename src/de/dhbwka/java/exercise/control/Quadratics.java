@@ -24,7 +24,7 @@ public class Quadratics {
         scanner.close();
     }
 
-    private double[] calculate(double a, double b, double c) throws Exception {
+    double[] calculate(double a, double b, double c) throws Exception {
         double[] solutions = new double[2];
         if (a == 0) {
             if (b == 0) {

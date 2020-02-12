@@ -25,8 +25,4 @@ public class Babylon {
         System.out.printf("Result: %.0f", xn);
         scanner.close();
     }
-
-    static double root(int a, double prev) {
-        return (prev + a / prev) / 2;
-    }
 }

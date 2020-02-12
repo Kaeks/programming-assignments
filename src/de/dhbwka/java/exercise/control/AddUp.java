@@ -11,7 +11,7 @@ public class AddUp {
             System.out.println("0 - While");
             System.out.println("1 - Do While");
             mode = scan.nextInt();
-        } while (mode != 0 && mode != 1);
+        } while (mode == -1);
 
         int cumulative = 0;
 
@@ -32,7 +32,7 @@ public class AddUp {
                 System.out.print("Type a number (exit: < 0): ");
                 newNum = scan.nextInt();
                 if (newNum < 0) {
-                    System.out.println("Result: " + cumulative);
+                    System.out.printf("Result: %d", cumulative);
                     break;
                 }
                 cumulative += newNum;

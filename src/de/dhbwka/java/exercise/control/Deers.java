@@ -9,7 +9,7 @@ public class Deers {
         while (deer < 300) {
             i++;
             deer = (int) (deer * (1 + increaseRate) - 15);
-            System.out.println(i + ": " + deer + " deer");
+            System.out.printf("%d: %d deer", i, deer);
         }
     }
 }

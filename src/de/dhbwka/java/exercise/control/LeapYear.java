@@ -24,7 +24,7 @@ public class LeapYear {
 
     }
 
-    private void asker() {
+    void asker() {
         System.out.print("Which year? ");
         Scanner scanner = new Scanner(System.in);
         int year = scanner.nextInt();
