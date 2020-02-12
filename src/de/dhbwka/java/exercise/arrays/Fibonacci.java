@@ -7,7 +7,7 @@ public class Fibonacci {
     public static void main(String[] args) {
         Fibonacci f = new Fibonacci();
         Scanner scan = new Scanner(System.in);
-        System.out.printf("n: ");
+        System.out.print("n: ");
         int n = scan.nextInt();
         System.out.println(Arrays.toString(f.getFibonacciArray(n)));
     }

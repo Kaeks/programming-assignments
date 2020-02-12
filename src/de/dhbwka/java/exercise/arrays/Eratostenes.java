@@ -28,7 +28,7 @@ public class Eratostenes {
                 }
             }
 
-            for (int j = 2, multiple = i; i * j <= n; j++) {
+            for (int j = 2, multiple; i * j <= n; j++) {
                 multiple = i * j;
                 bools[multiple] = false;
             }
