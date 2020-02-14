@@ -15,7 +15,8 @@ public class Eratostenes {
 
     int[] getPrimes(int n) {
         int[] sieve = getFilledNumberArray(n + 1);
-        boolean[] bools = getFilledBooleanArray(n + 1, true);
+        boolean[] bools = new boolean[n + 1];
+        Arrays.fill(bools, true);
         int[] primes = new int[n + 1];
         for (int i = 2; i <= n; i++) {
             if (!bools[i]) continue;
@@ -40,14 +41,6 @@ public class Eratostenes {
         int[] arr = new int[n];
         for (int i = 0; i < n; i++) {
             arr[i] = i;
-        }
-        return arr;
-    }
-
-    boolean[] getFilledBooleanArray(int length, boolean val) {
-        boolean[] arr = new boolean[length];
-        for (int i = 0; i < length; i++) {
-            arr[i] = val;
         }
         return arr;
     }
