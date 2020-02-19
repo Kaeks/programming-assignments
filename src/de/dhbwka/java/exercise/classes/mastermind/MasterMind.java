@@ -5,6 +5,9 @@ import de.jakob.util.CharConverter;
 import java.util.ArrayList;
 
 public class MasterMind {
+
+    private CharConverter cc = new CharConverter();
+
     private int maxTrials;
     private int trials;
     private char min;
@@ -37,11 +40,33 @@ public class MasterMind {
         previousTrials = new ArrayList<>();
     }
 
+    void reset() {
+        trials = 0;
+        previousTrials = new ArrayList<>();
+    }
+
     void think() {
         thought = new char[options];
         for (int i = 0; i < options; i++) {
             thought[i] = getRandomChar();
         }
+    }
+
+    public boolean checkValidInput(char[] in) {
+        
+        for (int i = 0; i < in.length; i++) {
+            try {
+            in[i] = cc.getUcIfLetter(in[i]); 
+            } catch (IllegalArgumentException iae) {
+                return false;
+            }
+        }
+
+        if (in.length != options) return false;
+        for (char c : in) {
+            if (c > max || c < min) return false;
+        } 
+        return true;
     }
 
     public boolean attempt(char[] guess) {
@@ -54,6 +79,7 @@ public class MasterMind {
         trial.determineCorrectPlaces();
         trial.determineWrongPlaces();
         int correct = trial.getCorrectPlaces();
+        trials++;
         previousTrials.add(trial);
         return correct == options;
     }
@@ -72,6 +98,14 @@ public class MasterMind {
 
     public char getMin() {
         return min;
+    }
+
+    public char getMax() {
+        return max;
+    }
+
+    public int getMaxTrials() {
+        return maxTrials;
     }
 
     public int getOptions() {

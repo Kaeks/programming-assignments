@@ -12,6 +12,10 @@ public class Trial {
         this.thought = thought;
     }
 
+    public char[] getValues() {
+        return values;
+    }
+
     public int getCorrectPlaces() {
         return correctPlaces;
     }
