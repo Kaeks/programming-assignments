@@ -1,7 +1,5 @@
 package de.dhbwka.java.exercise.classes.nimmspiel;
 
-import java.util.Scanner;
-
 public class Nimmspiel {
     private Player plr0;
     private Player plr1;

@@ -99,5 +99,6 @@ public class NimmspielTest {
         }
         System.out.println("We have a winner!");
         System.out.printf("%s wins this match!", ns.getWinner().getName());
+        scan.close();
     }
 }

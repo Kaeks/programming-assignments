@@ -33,5 +33,6 @@ public class LottoTest {
         System.out.printf("Ihre getippten Werte:%n%s%n", Arrays.toString(as.mergeSort(deutschesLotto.getGuess())));
         deutschesLotto.determinePulled();
         System.out.println(deutschesLotto.toString());
+        scan.close();
     }
 }
