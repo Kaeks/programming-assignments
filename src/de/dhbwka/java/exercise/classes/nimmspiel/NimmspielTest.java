@@ -60,6 +60,7 @@ public class NimmspielTest {
             System.out.println(ns.toString());
             while (!pileValid) {
                 System.out.printf("%s, choose a pile! (1/2) ", playingName);
+
                 if (scan.hasNextByte()) {
                     typedPile = scan.nextByte();
                 } else {
@@ -67,19 +68,14 @@ public class NimmspielTest {
                     System.out.println("xD");
                     continue;
                 }
+
                 boolean selectedPileIsEmpty;
-                if (typedPile == 1) {
-                    selectedPileIsEmpty = ns.getPile0().isEmpty();
-                } else if (typedPile == 2) {
-                    selectedPileIsEmpty = ns.getPile1().isEmpty();
-                } else {
-                    continue;
-                }
-                if (selectedPileIsEmpty) {
-                    System.out.printf("Pile #%d is empty!%n", typedPile);
-                } else {
-                    pileValid = true;
-                }
+                if (typedPile == 1) selectedPileIsEmpty = ns.getPile0().isEmpty();
+                else if (typedPile == 2) selectedPileIsEmpty = ns.getPile1().isEmpty();
+                else continue;
+
+                if (selectedPileIsEmpty) System.out.printf("Pile #%d is empty!%n", typedPile);
+                else pileValid = true;
             }
 
             int amount;

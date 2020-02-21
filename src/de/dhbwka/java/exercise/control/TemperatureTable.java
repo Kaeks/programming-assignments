@@ -4,7 +4,6 @@ import java.util.Locale;
 
 public class TemperatureTable {
     public static void main(String[] args) {
-        TemperatureTable tt = new TemperatureTable();
         System.out.println("  °F  |  °C   " );
         System.out.println("------+-------");
         for (int f = 0; f <= 300; f++) {
