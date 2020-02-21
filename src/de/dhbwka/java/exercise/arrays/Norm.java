@@ -15,6 +15,7 @@ public class Norm {
         }
         double len = norm.getVectorLength(vector);
         System.out.printf("Length of vector x is %f", len);
+        scan.close();
     }
 
     double getVectorLength(int[] vector) {

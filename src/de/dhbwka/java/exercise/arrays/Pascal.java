@@ -28,6 +28,7 @@ public class Pascal {
         else p = new Pascal(n);
         p.fill();
         p.display();
+        scan.close();
     }
 
     public Pascal(int n) {

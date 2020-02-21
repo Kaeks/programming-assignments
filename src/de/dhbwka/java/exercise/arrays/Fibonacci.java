@@ -10,6 +10,7 @@ public class Fibonacci {
         System.out.print("n: ");
         int n = scan.nextInt();
         System.out.println(Arrays.toString(f.getFibonacciArray(n)));
+        scan.close();
     }
 
     long[] getFibonacciArray(int n) {

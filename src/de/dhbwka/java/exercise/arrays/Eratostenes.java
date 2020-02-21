@@ -11,6 +11,7 @@ public class Eratostenes {
         int n = scan.nextInt();
         int[] primes = e.getPrimes(n);
         System.out.println(Arrays.toString(primes));
+        scan.close();
     }
 
     int[] getPrimes(int n) {

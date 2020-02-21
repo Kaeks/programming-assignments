@@ -20,7 +20,7 @@ public class DotProduct {
         }
         int dot = dp.getDotProduct(vectorX, vectorY);
         System.out.printf("Dot product of x and y is %d", dot);
-
+        scan.close();
     }
 
     int getDotProduct(int[] vX, int[] vY) {
