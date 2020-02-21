@@ -3,13 +3,11 @@ package de.dhbwka.java.exercise.classes.mastermind;
 public class Trial {
 
     private char[] values;
-    private char[] thought;
     private int correctPlaces = -1;
     private int wrongPlaces = -1;
 
-    public Trial(char[] values, char[] thought) {
+    public Trial(char[] values) {
         this.values = values;
-        this.thought = thought;
     }
 
     public char[] getValues() {
@@ -24,7 +22,7 @@ public class Trial {
         return wrongPlaces;
     }
 
-    private boolean[] getCorrectPlacesBool() {
+    private boolean[] getCorrectPlacesBool(char[] thought) {
         boolean[] correctCorrect = new boolean[values.length];
         for (int i = 0; i < values.length; i++) {
             if (thought[i] == values[i]) correctCorrect[i] = true;
@@ -32,16 +30,16 @@ public class Trial {
         return correctCorrect;
     }
 
-    public void determineCorrectPlaces() {
+    public void determineCorrectPlaces(char[] thought) {
         int amt = 0;
-        for (boolean val : getCorrectPlacesBool()) if (val) amt++;
+        for (boolean val : getCorrectPlacesBool(thought)) if (val) amt++;
         correctPlaces = amt;
     }
 
-    public void determineWrongPlaces() {
+    public void determineWrongPlaces(char[] thought) {
         boolean[] checkedT = new boolean[thought.length];
         boolean[] checkedV = new boolean[values.length];
-        boolean[] correctCorrect = getCorrectPlacesBool();
+        boolean[] correctCorrect = getCorrectPlacesBool(thought);
 
         int amt = 0;
 

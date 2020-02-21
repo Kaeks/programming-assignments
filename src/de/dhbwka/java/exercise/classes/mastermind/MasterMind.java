@@ -75,9 +75,9 @@ public class MasterMind {
         for (int i = 0; i < options; i++) {
             convertedGuess[i] = cc.getUcIfLetter(guess[i]);
         }
-        Trial trial = new Trial(convertedGuess, thought);
-        trial.determineCorrectPlaces();
-        trial.determineWrongPlaces();
+        Trial trial = new Trial(convertedGuess);
+        trial.determineCorrectPlaces(thought);
+        trial.determineWrongPlaces(thought);
         int correct = trial.getCorrectPlaces();
         trials++;
         previousTrials.add(trial);
