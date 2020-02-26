@@ -1,24 +1,24 @@
 package de.jakob.util;
 
 public enum AnsiCode {
-    ANSI_RESET("\u001B[0m"),
-    ANSI_BLACK("\u001B[30m"),
-    ANSI_RED("\u001B[31m"),
-    ANSI_GREEN("\u001B[32m"),
-    ANSI_YELLOW("\u001B[33m"),
-    ANSI_BLUE("\u001B[34m"),
-    ANSI_PURPLE("\u001B[35m"),
-    ANSI_CYAN("\u001B[36m"),
-    ANSI_WHITE("\u001B[37m"),
+    RESET("\u001B[0m"),
+    BLACK("\u001B[30m"),
+    RED("\u001B[31m"),
+    GREEN("\u001B[32m"),
+    YELLOW("\u001B[33m"),
+    BLUE("\u001B[34m"),
+    PURPLE("\u001B[35m"),
+    CYAN("\u001B[36m"),
+    WHITE("\u001B[37m"),
 
-    ANSI_BLACK_BACKGROUND("\u001B[40m"),
-    ANSI_RED_BACKGROUND("\u001B[41m"),
-    ANSI_GREEN_BACKGROUND("\u001B[42m"),
-    ANSI_YELLOW_BACKGROUND("\u001B[43m"),
-    ANSI_BLUE_BACKGROUND("\u001B[44m"),
-    ANSI_PURPLE_BACKGROUND("\u001B[45m"),
-    ANSI_CYAN_BACKGROUND("\u001B[46m"),
-    ANSI_WHITE_BACKGROUND("\u001B[47m");
+    BLACK_BACKGROUND("\u001B[40m"),
+    RED_BACKGROUND("\u001B[41m"),
+    GREEN_BACKGROUND("\u001B[42m"),
+    YELLOW_BACKGROUND("\u001B[43m"),
+    BLUE_BACKGROUND("\u001B[44m"),
+    PURPLE_BACKGROUND("\u001B[45m"),
+    CYAN_BACKGROUND("\u001B[46m"),
+    WHITE_BACKGROUND("\u001B[47m");
 
     private String value;
 
@@ -26,7 +26,7 @@ public enum AnsiCode {
         this.value = value;
     }
 
-    String getValue() {
+    public String getValue() {
         return value;
     }
 }
