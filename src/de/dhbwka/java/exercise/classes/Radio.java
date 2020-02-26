@@ -8,9 +8,9 @@ public class Radio {
     private double frequency;
 
     public Radio() {
-        this.on = true;
-        this.volume = 50;
-        this.frequency = 85.0;
+        on = true;
+        volume = 50;
+        frequency = 85.0;
     }
 
     public Radio(boolean on, int volume, double frequency) {
@@ -19,27 +19,30 @@ public class Radio {
         this.frequency = frequency;
     }
 
-    boolean getOn() { return this.on; }
-    int getVolume() { return this.volume; }
-    double getFrequency() { return this.frequency; }
+    boolean getOn() { return on; }
+    int getVolume() { return volume; }
+    double getFrequency() { return frequency; }
 
     void incVolume() {
-        this.volume = this.volume < 100 ? this.volume + 1 : 100;
+        if (!on) return;
+        volume = volume < 100 ? volume + 1 : 100;
     }
 
     void decVolume() {
-        this.volume = this.volume > 0 ? this.volume - 1 : 0;
+        if (!on) return;
+        volume = volume > 0 ? volume - 1 : 0;
     }
 
-    void turnOn() { this.on = true; }
-    void turnOff() { this.on = false; }
+    void turnOn() { on = true; }
+    void turnOff() { on = false; }
 
     void setFrequency(double frequency) {
         this.frequency = frequency <= 110.0 && frequency >= 85.0 ? frequency : 99.9d;
     }
 
+    @Override
     public String toString() {
-        String onString = this.on ? "an" : "aus";
-        return String.format(Locale.US, "Radio %s: Frequency = %3.1f Volume = %3d MHz", onString, this.frequency, this.volume);
+        String onString = on ? "an " : "aus";
+        return String.format(Locale.US, "Radio %s: Frequency = %3.1f MHz Volume = %3d", onString, frequency, volume);
     }
 }

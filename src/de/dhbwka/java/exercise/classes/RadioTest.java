@@ -6,7 +6,8 @@ public class RadioTest {
         System.out.println(radio);
         radio.turnOn();
         System.out.println(radio);
-        radio.incVolume(); radio.incVolume();
+        radio.incVolume();
+        radio.incVolume();
         System.out.println(radio);
         radio.incVolume();
         radio.incVolume();
