@@ -33,7 +33,26 @@ public class Cell {
 
     public boolean toggleFlag() {
         flag = isCovered() ? !flag : false;
+        if (flag) question = false;
         return flag;
+    }
+
+    public boolean toggleQuestion() {
+        question = isCovered() ? !question : false;
+        if (question) flag = false;
+        return question;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "- Cell -%n%s%nC: %s, M: %s, F: %s, Q: %s",
+            position,
+            covered,
+            mine,
+            flag,
+            question
+        );
     }
 
 }

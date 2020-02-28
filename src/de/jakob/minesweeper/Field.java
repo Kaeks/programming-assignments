@@ -65,6 +65,7 @@ public class Field {
     private String getFormattedString(char value) {
         if (value == 'P') return AnsiCode.BLUE_BACKGROUND.getValue() + AnsiCode.RED.getValue() + value + " " + AnsiCode.RESET.getValue();
         if (value == '*') return AnsiCode.YELLOW_BACKGROUND.getValue() + AnsiCode.RED.getValue() + value + " " + AnsiCode.RESET.getValue();
+        if (value == '#') return AnsiCode.WHITE_BACKGROUND.getValue() + value + " " + AnsiCode.RESET.getValue();
         return value + " ";
     }
 
@@ -72,6 +73,29 @@ public class Field {
         return getFormattedString(getValue(x, y));
     }
 
+    /**
+     * Fills the field with a set amount of mines without placing one at a specific position
+     * @param position The position to avoid
+     * @param amount The amount of mines to place
+     */
+    public void fillAround(Position position, int amount) {
+        for (int i = 0; i < amount; i++) {
+            int randX;
+            int randY;
+            boolean valid = false;
+            do {
+                randX = (int) (Math.random() * width);
+                randY = (int) (Math.random() * height);
+                if (randX == position.getX() && randY == position.getY()) continue;
+                if (getCell(randX, randY).setMine()) valid = true;
+            } while (!valid);
+        }
+    }
+
+    /**
+     * Fills the field with a set amount of mines
+     * @param amount The amount of mines to place
+     */
     public void fill(int amount) {
         for (int i = 0; i < amount; i++) {
             int randX;
@@ -83,68 +107,97 @@ public class Field {
         }
     }
 
+    /**
+     * Uncovers the field recursively
+     * @param cell The cell to attempt to uncover
+     */
     private void recursiveUncover(Cell cell) {
-        System.out.println(this);
-        if (!cell.isCovered()) {
-            System.out.println("Cell is already uncovered.");
-            return;
-        }
-        Position pos = cell.getPosition();
+        // Skip uncovered cells
+        if (!cell.isCovered()) return;
+
         cell.uncover();
-        if (getNeighboringMines(cell) == 0) {
+
+        System.out.println(this);
+
+        if (!cell.isMine() && getNeighboringMines(cell) == 0) {
+            Position pos = cell.getPosition();
             for (int i = -1; i <= 1; i++) {
-                if (i == 0) {
-                    System.out.println("i is 0.");
-                    continue;
-                }
-                if (pos.getX() + i < 0 || pos.getX() + i >= width) {
-                    System.out.printf("X is out of bounds (%d).%n", pos.getX() + i);
-                    continue;
-                }
-                if (pos.getY() + i < 0 || pos.getY() + i >= height) {
-                    System.out.printf("Y is out of bounds (%d).%n", pos.getX() + i);
-                    continue;
-                }
+                for (int j = -1; j <= 1; j++) {
+                    // Skip same cell
+                    if (i == 0 && j == 0) continue;
 
-                Cell xCell = getCell(pos.getX() + i, pos.getY());
-                Cell yCell = getCell(pos.getX(), pos.getY() + i);
+                    int lookingX = pos.getX() + i;
+                    int lookingY = pos.getY() + j;
 
-                recursiveUncover(xCell);
-                recursiveUncover(yCell);
+                    // Check out of bounds and skip
+                    if (lookingX < 0 || lookingX >= width) continue;
+                    if (lookingY < 0 || lookingY >= height) continue;
+
+                    // Uncover recursively
+                    recursiveUncover(getCell(lookingX, lookingY));
+                }
             }
         }
     }
 
-    private boolean commitUncover(Cell cell) {
-        if (!cell.isCovered()) return false;
-        if (cell.isFlag()) return false;
+    private void commitUncover(Cell cell) {
+        if (!cell.isCovered()) return;
+        if (cell.isFlag()) return;
         recursiveUncover(cell);
-        return true;
     }
 
-    private boolean commitFlag(Cell cell) {
-        if (!cell.isCovered()) return false;
+    private void commitFlag(Cell cell) {
+        if (!cell.isCovered()) return;
         cell.toggleFlag();
-        return true;
     }
 
-    private boolean commitQuestion(Cell cell) {
-        return false;
+    private void commitQuestion(Cell cell) {
+        if (!cell.isCovered()) return;
+        cell.toggleQuestion();
     }
 
-    public boolean commit(Move move) {
-        System.out.println("Commit");
+    public Cell commit(Move move) {
         Position position = move.getPosition();
         if (!position.isWithin(0, width, 0, height)) {
             throw new IllegalArgumentException(String.format("%s is out of bounds.", position));
         }
         Cell cell = getCell(position.getX(), position.getY());
         switch(move.getMoveType()) {
-            case UNCOVER: return commitUncover(cell);
-            case FLAG: return commitFlag(cell);
-            case QUESTION: return commitQuestion(cell);
-            default: return false;
+            case UNCOVER: commitUncover(cell); break;
+            case FLAG: commitFlag(cell); break;
+            case QUESTION: commitQuestion(cell); break;
         }
+        return cell;
+    }
+
+    public void uncoverAllMines() {
+        for (ArrayList<Cell> row : cells) {
+            for (Cell cell : row) {
+                if (cell.isMine()) cell.uncover();
+            }
+        }
+    }
+
+    public boolean allMinesFound() {
+        for (ArrayList<Cell> row : cells) {
+            for (Cell cell : row) {
+                if (!cell.isMine() && cell.isCovered()) return false;
+            }
+        }
+        return true;
+    }
+
+    private String getColumnName(int number) {
+        StringBuilder sb = new StringBuilder();
+        while (number-- > 0) {
+            sb.append((char)('A' + (number % 26)));
+            number /= 26;
+        }
+        return sb.reverse().toString();
+    }
+
+    private String getFormattedHeader(String s) {
+        return AnsiCode.RED.getValue() + s + AnsiCode.RESET.getValue();
     }
 
     @Override
@@ -152,8 +205,8 @@ public class Field {
         String s = "";
 
         for (int y = -1; y < height; y++) {
-            if (y == -1) for (int x = -1; x < width; x++) s += (x == -1 ? "  " : (char)('A' + x) + " ");
-            else for (int x = -1; x < width; x++) s += x == -1 ? y + 1 + " "  : getFormattedString(x, y);
+            if (y == -1) for (int x = -1; x < width; x++) s += (x == -1 ? "  " : getFormattedHeader(String.format("%-2s", getColumnName(x + 1))));
+            else for (int x = -1; x < width; x++) s += x == -1 ? getFormattedHeader(String.format("%-2d", y + 1))  : getFormattedString(x, y);
             s += "\n";
         }
 
