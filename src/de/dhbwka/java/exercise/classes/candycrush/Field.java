@@ -1,6 +1,6 @@
 package de.dhbwka.java.exercise.classes.candycrush;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import de.jakob.util.AnsiCode;
 
@@ -9,13 +9,11 @@ public class Field {
     private int size;
     private int colors;
     private byte[][] values;
-    private boolean[][] delete;
 
     public Field(int size, int colors) {
         this.size = size;
         this.colors = colors;
         values = new byte[size][size];
-        delete = new boolean[size][size];
         generateValues();
     }
 
@@ -84,56 +82,51 @@ public class Field {
         return false;
     }
 
-    private void markDelete(int x, int y) {
-        delete[y][x] = true;
-    }
-
-    private void markDelete(Position pos) {
-        markDelete(pos.getX(), pos.getY());
-    }
-
-    private boolean findToDeleteHorizontally(Position pos) {
+    private ArrayList<Position> findToDeleteHorizontally(Position pos) {
         byte value = getValueAt(pos);
-        boolean added = false;
         int neighboring = 0;
+        ArrayList<Position> toDelete = new ArrayList<Position>();
         for (int x = 0; x < size; x++) {
             if (getValueAt(x, pos.getY()) == value) neighboring++;
             else if (neighboring >= 3) {
                 for (int i = x - 1; i >= x - neighboring; i--) {
-                    markDelete(i, pos.getY());
-                    added = true;
+                    toDelete.add(new Position (i, pos.getX()));
                 }
                 break;
             } else neighboring = 0;
         }
-        return added;
+        return toDelete;
     }
 
-    private boolean findToDeleteVertically(Position pos) {
+    private ArrayList<Position> findToDeleteVertically(Position pos) {
         byte value = getValueAt(pos);
-        boolean added = false;
         int neighboring = 0;
+        ArrayList<Position> toDelete = new ArrayList<Position>();
         for (int y = 0; y < size; y++) {
             if (getValueAt(pos.getX(), y) == value) neighboring++;
             else if (neighboring >= 3) {
                 for (int i = y - 1; i >= y - neighboring; i--) {
-                    markDelete(pos.getX(), i);
-                    added = true;
+                    toDelete.add(new Position (pos.getX(), i));
                 }
                 break;
             } else neighboring = 0;
         }
-        return added;
+        return toDelete;
     }
 
-    private boolean findToDelete(Position pos) {
-        return findToDeleteHorizontally(pos) | findToDeleteVertically(pos);
+    private ArrayList<Position> mergePositions(ArrayList<Position> list1, ArrayList<Position> list2) {
+        ArrayList<Position> merged = new ArrayList<Position>();
+        merged.addAll(list1);
+        for (Position pos : list2) if (!merged.contains(pos)) merged.add(pos);
+        return merged;
     }
 
-    private void resetDelete() {
-        for (boolean[] row : delete) {
-            Arrays.fill(row, false);
-        }
+    private ArrayList<Position> findToDelete(Move move) {
+        return mergePositions(findToDelete(move.getPos1()), findToDelete(move.getPos2()));
+    }
+
+    private ArrayList<Position> findToDelete(Position pos) {
+        return mergePositions(findToDeleteHorizontally(pos), findToDeleteVertically(pos));
     }
 
     /**
@@ -147,13 +140,12 @@ public class Field {
         }
     }
 
-    private boolean findToDeleteInColumn(int x) {
-        boolean added = false;
+    private ArrayList<Position> findToDeleteInColumn(int x) {
+        ArrayList<Position> merged = new ArrayList<Position>();
         for (int y = 0; y < size; y++) {
-            if (findToDeleteHorizontally(new Position(x, y))) added = true;
-            if (findToDeleteVertically(new Position(x, y))) added = true;
+            merged = mergePositions(merged, findToDelete(new Position(x, y)));
         }
-        return added;
+        return merged;
     }
 
     private void regenerateColumn(int x) {
@@ -164,18 +156,13 @@ public class Field {
         }
     }
 
-    private int executeOrderDeletyDelete() {
+    private int executeOrderDeletyDelete(ArrayList<Position> toDelete) {
         int deleted = 0;
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) {
-                if (delete[y][x]) {
-                    setValueAt(x, y, (byte) -1);
-                    if (y != 0) shiftColumn(x, y - 1);
-                    deleted++;
-                }
-            }
+        for (Position pos : toDelete) {
+            setValueAt(pos, (byte) -1);
+            if (pos.getY() != 0) shiftColumn(pos.getX(), pos.getY() - 1);
+            deleted++;
         }
-        resetDelete();
         // System.out.println("Deleted!");
         // System.out.println(this);
 
@@ -183,25 +170,27 @@ public class Field {
             regenerateColumn(x);
             // System.out.println("Regenerated column!");
             // System.out.println(this);
-            if (findToDeleteInColumn(x)) {
+            ArrayList<Position> anotherToDelete = findToDeleteInColumn(x);
+            if (anotherToDelete.size() > 0) {
                 // System.out.println("Found to delete another!");
                 // System.out.println(this);
-                deleted += executeOrderDeletyDelete();
+                deleted += executeOrderDeletyDelete(anotherToDelete);
             }
         }
 
         return deleted;
     }
 
-    public int commitMove(Position from, Position to) {
-        swap(from, to);
-        // System.out.println("Player swapped!");
-        // System.out.println(this);
-        findToDelete(from);
-        findToDelete(to);
-        // System.out.println("Found to delete!");
-        // System.out.println(this);
-        return executeOrderDeletyDelete();
+    public int commit(Move move) {
+        if (!move.isWithin(0, size)) throw new IllegalArgumentException("Move out of bounds.");
+        swap(move.getPos1(), move.getPos2());
+        ArrayList<Position> toDelete = findToDelete(move);
+        if (toDelete.size() > 0) {
+            return executeOrderDeletyDelete(toDelete);
+        } else {
+            swap(move.getPos1(), move.getPos2());
+            throw new IllegalArgumentException("Move does not produce any matches.");
+        }
     }
 
     public void swap(Position from, Position to) {
@@ -259,7 +248,7 @@ public class Field {
 
         for (int y = -1; y < size; y++) {
             if (y == -1) for (int x = -1; x < size; x++) s += (x == -1 ? " " : (char)('A' + x)) + " ";
-            else for (int x = -1; x < size; x++) s += x == -1 ? y + 1 + " " : colors <= 7 ? getColoredString((delete[y][x] ? "XX" :"  "), getValueAt(x, y)) : String.format("%2d", getValueAt(x, y));
+            else for (int x = -1; x < size; x++) s += x == -1 ? y + 1 + " " : colors <= 7 ? getColoredString("  ", getValueAt(x, y)) : String.format("%2d", getValueAt(x, y));
             s += "\n";
         }
 

@@ -2,13 +2,19 @@ package de.dhbwka.java.exercise.classes.candycrush;
 
 public class Player {
 
+    private String name;
     private int points = 0;
 
-    public Player() {
+    public Player(String name) {
+        this.name = name;
     }
 
     public int getPoints() {
         return points;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void addPoints(int amount) {
@@ -17,6 +23,6 @@ public class Player {
 
     @Override
     public String toString() {
-        return String.format("Player: %d points", points);
+        return String.format("Player \"%s\": %d points", name, points);
     }
 }
