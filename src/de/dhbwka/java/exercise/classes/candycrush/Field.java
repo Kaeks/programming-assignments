@@ -1,6 +1,6 @@
 package de.dhbwka.java.exercise.classes.candycrush;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import de.jakob.util.AnsiCode;
 
@@ -10,6 +10,7 @@ public class Field {
     private int colors;
     private byte[][] values;
 
+    private final byte DELETED_VALUE = -1;
     public Field(int size, int colors) {
         this.size = size;
         this.colors = colors;
@@ -37,6 +38,17 @@ public class Field {
         setValueAt(pos.getX(), pos.getY(), value);
     }
 
+    private void setDeleted(int x, int y) {
+        setValueAt(x, y, DELETED_VALUE);
+    }
+
+    private void setDeleted(Position pos) {
+        setDeleted(pos.getX(), pos.getY());
+    }
+
+    /**
+     * Randomly populates the entire field
+     */
     private void generateValues() {
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
@@ -45,146 +57,197 @@ public class Field {
         }
     }
 
-    public boolean isValidVertically(Position pos, byte value) {
-        int neighboring = 0;
-        for (int y = pos.getY() - 2; y <= pos.getY() + 2; y++) {
-            if (y < 0 || y >= size) continue;
-            if (y == pos.getY() || getValueAt(pos.getX(), y) == value) neighboring++;
-            else neighboring = 0;
-            if (neighboring >= 3) return true;
-        }
-        return false;
-    }
-
-    public boolean isValidHorizontally(Position pos, byte value) {
-        int neighboring = 0;
-        for (int x = pos.getX() - 2; x <= pos.getX() + 2; x++) {
-            if (x < 0 || x >= size) continue;
-            if (x == pos.getX() || getValueAt(x, pos.getY()) == value) neighboring++;
-            else neighboring = 0;
-            if (neighboring >= 3) return true;
-        }
-        return false;
-    }
-
-    public boolean isValidMove(Position from, Position to){
-        // Catch moves outside of the field
-        if (!from.isWithin(0, size - 1) || !to.isWithin(0, size - 1)) return false;
-        // Catch same field
-        if (from.equals(to)) return false;
-        // Catch fields that are not adjacent to each other
-        if (!from.isAdjacentTo(to)) return false;
-        byte fromValue = getValueAt(from);
-        byte toValue = getValueAt(to);
-        if (isValidHorizontally(from, toValue) || isValidVertically(from, toValue) || isValidHorizontally(to, fromValue) || isValidVertically(to, fromValue)) {
-            return true;
-        }
-        return false;
-    }
-
-    private ArrayList<Position> findToDeleteHorizontally(Position pos) {
+    /**
+     * Looks for cells to delete horizontally with regard for the cell located at a specific position
+     * @param pos The position to start looking from
+     * @return A set of positions that are to be deleted
+     */
+    private HashSet<Position> findToDeleteHorizontally(Position pos) {
         byte value = getValueAt(pos);
-        int neighboring = 0;
-        ArrayList<Position> toDelete = new ArrayList<Position>();
-        for (int x = 0; x < size; x++) {
-            if (getValueAt(x, pos.getY()) == value) neighboring++;
-            else if (neighboring >= 3) {
-                for (int i = x - 1; i >= x - neighboring; i--) {
-                    toDelete.add(new Position (i, pos.getX()));
-                }
-                break;
-            } else neighboring = 0;
+        int startIndex = pos.getX(), endIndex = pos.getX();
+        while (startIndex > 0 && getValueAt(startIndex - 1, pos.getY()) == value) {
+            startIndex--;
+        }
+        while (endIndex < size - 1 && getValueAt(endIndex + 1, pos.getY()) == value) {
+            endIndex++;
+        }
+        HashSet<Position> toDelete = new HashSet<Position>();
+        if (endIndex - startIndex >= 3 - 1) {
+            for (int x = startIndex; x <= endIndex; x++) {
+                toDelete.add(new Position(x, pos.getY()));
+            }
         }
         return toDelete;
-    }
-
-    private ArrayList<Position> findToDeleteVertically(Position pos) {
-        byte value = getValueAt(pos);
-        int neighboring = 0;
-        ArrayList<Position> toDelete = new ArrayList<Position>();
-        for (int y = 0; y < size; y++) {
-            if (getValueAt(pos.getX(), y) == value) neighboring++;
-            else if (neighboring >= 3) {
-                for (int i = y - 1; i >= y - neighboring; i--) {
-                    toDelete.add(new Position (pos.getX(), i));
-                }
-                break;
-            } else neighboring = 0;
-        }
-        return toDelete;
-    }
-
-    private ArrayList<Position> mergePositions(ArrayList<Position> list1, ArrayList<Position> list2) {
-        ArrayList<Position> merged = new ArrayList<Position>();
-        merged.addAll(list1);
-        for (Position pos : list2) if (!merged.contains(pos)) merged.add(pos);
-        return merged;
-    }
-
-    private ArrayList<Position> findToDelete(Move move) {
-        return mergePositions(findToDelete(move.getPos1()), findToDelete(move.getPos2()));
-    }
-
-    private ArrayList<Position> findToDelete(Position pos) {
-        return mergePositions(findToDeleteHorizontally(pos), findToDeleteVertically(pos));
     }
 
     /**
-     * Shifts a column down by 1
-     * @param x The index of the column to shift
-     * @param maxY The lowest point of the partial column to shift
+     * Looks for cells to delete vertically with regard for the cell located at a specific position
+     * @param pos The position to start looking from
+     * @return A set of positions that are to be deleted
      */
-    private void shiftColumn(int x, int maxY) {
-        for (int y = maxY; y >= 0; y--) {
-            swap(new Position(x, y), new Position(x, y + 1));
+    private HashSet<Position> findToDeleteVertically(Position pos) {
+        byte value = getValueAt(pos);
+        int startIndex = pos.getY(), endIndex = pos.getY();
+        while (startIndex > 0 && getValueAt(pos.getX(), startIndex - 1) == value) {
+            startIndex--;
         }
+        while (endIndex < size - 1 && getValueAt(pos.getX(), endIndex + 1) == value) {
+            endIndex++;
+        }
+        HashSet<Position> toDelete = new HashSet<Position>();
+        if (endIndex - startIndex >= 3 - 1) {
+            for (int y = startIndex; y <= endIndex; y++) {
+                toDelete.add(new Position(pos.getX(), y));
+            }
+        }
+        return toDelete;
     }
 
-    private ArrayList<Position> findToDeleteInColumn(int x) {
-        ArrayList<Position> merged = new ArrayList<Position>();
-        for (int y = 0; y < size; y++) {
-            merged = mergePositions(merged, findToDelete(new Position(x, y)));
-        }
+    /**
+     * Looks for cells to delete following a certain Position
+     * @param pos The position to check
+     * @return A set of positions that are to be deleted
+     */
+    private HashSet<Position> findToDelete(Position pos) {
+        HashSet<Position> set1 = findToDeleteHorizontally(pos);
+        HashSet<Position> set2 = findToDeleteVertically(pos);
+        HashSet<Position> merged = new HashSet<Position>();
+        merged.addAll(set1);
+        merged.addAll(set2);
         return merged;
     }
 
-    private void regenerateColumn(int x) {
-        int curY = 0;
-        while (getValueAt(x, curY) == -1) {
-            setValueAt(x, curY, generateValue(x, curY));
-            curY++;
+    /**
+     * Looks for cells to delete along a certain column
+     * @param x The x coordinate of the column to check
+     * @return A set of positions that are to be deleted
+     */
+    private HashSet<Position> findToDeleteInColumn(int x) {
+        HashSet<Position> set = new HashSet<Position>();
+        for (int y = 0; y < size; y++) {
+            set.addAll(findToDelete(new Position(x, y)));
+        }
+        return set;
+    }
+
+    /**
+     * Looks for cells to delete following a certain move
+     * @param move The move to check
+     * @return A set of positions that are to be deleted
+     */
+    private HashSet<Position> findToDelete(Move move) {
+        HashSet<Position> set1 = findToDelete(move.getPos1());
+        HashSet<Position> set2 = findToDelete(move.getPos2());
+        HashSet<Position> merged = new HashSet<Position>();
+        merged.addAll(set1);
+        merged.addAll(set2);
+        return merged;
+    }
+
+    /**
+     * Sets the values of the cells located at all positions inside the set to the "deleted" value (0)
+     * @param toDelete A set of positions to delete
+     */
+    private void setValuesOfToBeDeleted(HashSet<Position> toDelete) {
+        for (Position pos : toDelete) {
+            setDeleted(pos);
         }
     }
 
-    private int executeOrderDeletyDelete(ArrayList<Position> toDelete) {
-        int deleted = 0;
-        for (Position pos : toDelete) {
-            setValueAt(pos, (byte) -1);
-            if (pos.getY() != 0) shiftColumn(pos.getX(), pos.getY() - 1);
-            deleted++;
-        }
-        // System.out.println("Deleted!");
-        // System.out.println(this);
-
-        for (int x = 0; x < size; x++) {
-            regenerateColumn(x);
-            // System.out.println("Regenerated column!");
-            // System.out.println(this);
-            ArrayList<Position> anotherToDelete = findToDeleteInColumn(x);
-            if (anotherToDelete.size() > 0) {
-                // System.out.println("Found to delete another!");
-                // System.out.println(this);
-                deleted += executeOrderDeletyDelete(anotherToDelete);
+    /**
+     * "Bubbles" the deleted values of a column up to the top of the column
+     * @param x The index of the column to bubble up
+     */
+    private void bubbleUpColumn(int x) {
+        for (int i = 0; i < size; i++) {
+            for (int y = size - 1; y > 0; y--) {
+                Position shiftPosition = new Position(x, y);
+                if (getValueAt(shiftPosition) == DELETED_VALUE) {
+                    Position dropPosition = new Position(x, y - 1);
+                    swap(shiftPosition, dropPosition);
+                }
             }
         }
+    }
 
+    /**
+     * Repopulates a certain column
+     * @param x The index of the column to repopulate
+     */
+    private void regenerateColumn(int x) {
+        int y = 0;
+        while (getValueAt(x, y) == DELETED_VALUE) {
+            setValueAt(x, y, generateValue(x, y));
+            y++;
+        }
+    }
+
+    /**
+     * Determines whether a certain column needs to be shifted. (Deleted values pushed to top)
+     * @param x The index of the column to check
+     * @return Needs to be shifted
+     */
+    private boolean needsShifting(int x) {
+        boolean sawRegular = false;
+        for (int y = 0; y < size; y++) {
+            boolean isDeleted = getValueAt(x, y) == DELETED_VALUE;
+            if (sawRegular && isDeleted) return true;
+            if (!(sawRegular || isDeleted)) sawRegular = true;
+        }
+        return false;
+    } 
+
+    private boolean hasDeletedCells(int x) {
+        for (int y = 0; y < size; y++) if (getValueAt(x, y) == DELETED_VALUE) return true;
+        return false;
+    }
+
+    /**
+     * Recursive deletion function
+     * @param toDelete Initial set of positions of cells to delete
+     * @return Amount of cells deleted in total
+     */
+    private int executeOrderDeletyDelete(HashSet<Position> toDelete) {
+        int deleted = toDelete.size();
+        setValuesOfToBeDeleted(toDelete);
+        HashSet<Position> moreDelete = new HashSet<Position>();
+        for (int x = 0; x < size; x++) {
+            if (hasDeletedCells(x)) {
+                if (needsShifting(x)) {
+                    System.out.println(this);
+                    System.out.printf("Column %d needs shifting!", x);
+                    bubbleUpColumn(x);
+                    System.out.println(this);
+                }
+                regenerateColumn(x);
+                System.out.println(this);
+                HashSet<Position> columnDelete = findToDeleteInColumn(x);
+                moreDelete.addAll(columnDelete);
+            }
+        }
+        drawDeleteList(moreDelete);
+        if (moreDelete.size() > 0) {
+            deleted += executeOrderDeletyDelete(moreDelete);
+        }
         return deleted;
+    }
+
+    private void drawDeleteList(HashSet<Position> toDelete) {
+        boolean[][] bools = new boolean[size][size];
+        for (Position pos : toDelete) {
+            bools[pos.getY()][pos.getX()] = true;
+        }
+        for (boolean[] row : bools) {
+            for (boolean val : row) System.out.print(val ? "XX" : "##");
+            System.out.println("");
+        }
     }
 
     public int commit(Move move) {
         if (!move.isWithin(0, size)) throw new IllegalArgumentException("Move out of bounds.");
         swap(move.getPos1(), move.getPos2());
-        ArrayList<Position> toDelete = findToDelete(move);
+        HashSet<Position> toDelete = findToDelete(move);
+        drawDeleteList(toDelete);
         if (toDelete.size() > 0) {
             return executeOrderDeletyDelete(toDelete);
         } else {
