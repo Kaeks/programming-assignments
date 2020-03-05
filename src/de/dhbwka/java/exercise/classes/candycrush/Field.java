@@ -25,6 +25,10 @@ public class Field {
         return size;
     }
 
+    public int getColors() {
+        return colors;
+    }
+
     public byte getValueAt(int x, int y) {
         return values[y][x];
     }
@@ -391,19 +395,19 @@ public class Field {
         return possibleMoves;
     }
 
-    private HashSet<Move> findPossible101Moves() {
-        HashSet<Move> possibleMoves = new HashSet<Move>();
-        possibleMoves.addAll(findPossibleHorizontal101Moves());
-        possibleMoves.addAll(findPossibleVertical101Moves());
-        return possibleMoves;
-    }
+    // private HashSet<Move> findPossible101Moves() {
+    //     HashSet<Move> possibleMoves = new HashSet<Move>();
+    //     possibleMoves.addAll(findPossibleHorizontal101Moves());
+    //     possibleMoves.addAll(findPossibleVertical101Moves());
+    //     return possibleMoves;
+    // }
 
-    private HashSet<Move> findPossibleMoves() {
-        HashSet<Move> possibleMoves = new HashSet<Move>();
-        possibleMoves.addAll(findPossible110Moves());
-        possibleMoves.addAll(findPossible101Moves());
-        return possibleMoves;
-    }
+    // private HashSet<Move> findPossibleMoves() {
+    //     HashSet<Move> possibleMoves = new HashSet<Move>();
+    //     possibleMoves.addAll(findPossible110Moves());
+    //     possibleMoves.addAll(findPossible101Moves());
+    //     return possibleMoves;
+    // }
 
     /**
      * Recursive deletion function
