@@ -8,6 +8,9 @@ public class Minesweeper {
     private PlayingStatus status;
 
     public Minesweeper(int width, int height, int amtMines) {
+        if (width * height <= amtMines) {
+            throw new IllegalArgumentException(String.format("Amount of mines (%d) must be less than amount of cells in the field (%d).", amtMines, width * height));
+        }
         field = new Field(width, height);
         this.amtMines = amtMines;
         status = PlayingStatus.BEFORE;
