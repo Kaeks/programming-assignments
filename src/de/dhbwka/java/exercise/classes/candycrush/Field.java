@@ -254,7 +254,7 @@ public class Field {
                     pairs.add(pair);
                 }
                 if (neighboring > 2) {
-                    throw new Exception(String.format("More than 2 neighboring same-colored fields in row %d, position %d. The field is supposed to be resting.", y, x));
+                    throw new Exception(String.format("More than 2 neighboring same-colored fields in column %d, position %d. The field is supposed to be resting.", x, y));
                 }
             }
         }
@@ -268,8 +268,12 @@ public class Field {
         return val1;
     }
 
-    private HashSet<Move> findPossibleHorizontal110Moves() throws Exception {
-        HashSet<Move> possibleMoves = new HashSet<Move>();
+    private void addMoveIfFits(HashSet<Move> set, Position check, Position put, byte value) {
+        if (getValueAt(check) == value) set.add(new Move(check, put));
+    }
+
+    private HashSet<Move> findHorizontal110Moves() throws Exception {
+        HashSet<Move> moves = new HashSet<Move>();
         HashSet<Pair<Position, Position>> pairs = findHorizontal110Pairs();
         for (Pair<Position, Position> pair : pairs) {
             byte value = getPairValue(pair);
@@ -277,59 +281,23 @@ public class Field {
             int y = l.getY();
             if (l.getX() > 0) {
                 Position close = new Position(l.getX() - 1, y);
-                if (y > 0) {
-                    Position far = new Position(l.getX() - 1, y - 1);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
-                if (y < size - 1) {
-                    Position far = new Position(l.getX() - 1, y + 1);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
-                if (l.getX() > 1) {
-                    Position far = new Position(l.getX() - 2, y);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
+                if (y > 0) addMoveIfFits(moves, new Position(l.getX() - 1, y - 1), close, value);
+                if (y < size - 1) addMoveIfFits(moves, new Position(l.getX() - 1, y + 1), close, value);
+                if (l.getX() > 1) addMoveIfFits(moves, new Position(l.getX() - 2, y), close, value);
             }
             Position r = pair.getR();
             if (r.getX() < size - 1) {
                 Position close = new Position(r.getX() + 1, y);
-                if (y > 0) {
-                    Position far = new Position(r.getX() + 1, y - 1);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
-                if (y < size - 1) {
-                    Position far = new Position(r.getX() + 1, y + 1);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
-                if (r.getX() < size - 2) {
-                    Position far = new Position(r.getX() + 2, y);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
+                if (y > 0) addMoveIfFits(moves, new Position(r.getX() + 1, y - 1), close, value);
+                if (y < size - 1) addMoveIfFits(moves, new Position(r.getX() + 1, y + 1), close, value);
+                if (r.getX() < size - 2) addMoveIfFits(moves, new Position(r.getX() + 2, y), close, value);
             }
         }
-        return possibleMoves;
+        return moves;
     }
 
-    private HashSet<Move> findPossibleVertical110Moves() throws Exception {
-        HashSet<Move> possibleMoves = new HashSet<Move>();
+    private HashSet<Move> findVertical110Moves() throws Exception {
+        HashSet<Move> moves = new HashSet<Move>();
         HashSet<Pair<Position, Position>> pairs = findVertical110Pairs();
         for (Pair<Position, Position> pair : pairs) {
             byte value = getPairValue(pair);
@@ -337,77 +305,100 @@ public class Field {
             int x = u.getX();
             if (u.getY() > 0) {
                 Position close = new Position(x, u.getY() - 1);
-                if (x > 0) {
-                    Position far = new Position(x - 1, u.getY() - 1);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
-                if (x < size - 1) {
-                    Position far = new Position(x + 1, u.getY() - 1);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
-                if (u.getY() > 1) {
-                    Position far = new Position(x, u.getY() - 2);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
+                if (x > 0) addMoveIfFits(moves, new Position(x - 1, u.getY() - 1), close, value);
+                if (x < size - 1) addMoveIfFits(moves, new Position(x + 1, u.getY() - 1), close, value);
+                if (u.getY() > 1) addMoveIfFits(moves, new Position(x, u.getY() - 2), close, value);
             }
             Position d = pair.getR();
             if (d.getY() < size - 1) {
                 Position close = new Position(x, d.getY() + 1);
-                if (x > 0) {
-                    Position far = new Position(x - 1, d.getY() + 1);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
-                if (x < size - 1) {
-                    Position far = new Position(x + 1, d.getY() + 1);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
-                    }
-                }
-                if (d.getY() < size - 2) {
-                    Position far = new Position(x, d.getY() + 2);
-                    if (getValueAt(far) == value) {
-                        Move move = new Move(far, close);
-                        possibleMoves.add(move);
+                if (x > 0) addMoveIfFits(moves, new Position(x - 1, d.getY() + 1), close, value);
+                if (x < size - 1) addMoveIfFits(moves, new Position(x + 1, d.getY() + 1), close, value);
+                if (d.getY() < size - 2) addMoveIfFits(moves, new Position(x, d.getY() + 2), close, value);
+            }
+        }
+        return moves;
+    }
+
+    /**
+     * Finds possible "110" moves (moves, where a block could be moved next to a pair of matching blocks)
+     * @return Set of possible moves
+     * @throws Exception
+     */
+    private HashSet<Move> find110Moves() throws Exception {
+        HashSet<Move> moves = new HashSet<Move>();
+        moves.addAll(findHorizontal110Moves());
+        moves.addAll(findVertical110Moves());
+        return moves;
+    }
+
+    private HashSet<Pair<Position, Position>> findHorizontal101Pairs() {
+        HashSet<Pair<Position, Position>> pairs = new HashSet<Pair<Position, Position>>();
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                Position here = new Position(x, y);
+                if (x < size - 2) {
+                    Position there = new Position(x + 2, y);
+                    if (getValueAt(there) == getValueAt(here)) {
+                        pairs.add(new Pair<Position, Position>(here, there));
                     }
                 }
             }
         }
-        return possibleMoves;
+        return pairs;
     }
 
-    private HashSet<Move> findPossible110Moves() throws Exception {
-        HashSet<Move> possibleMoves = new HashSet<Move>();
-        possibleMoves.addAll(findPossibleHorizontal110Moves());
-        possibleMoves.addAll(findPossibleVertical110Moves());
-        return possibleMoves;
+    private HashSet<Pair<Position, Position>> findVertical101Pairs() {
+        HashSet<Pair<Position, Position>> pairs = new HashSet<Pair<Position, Position>>();
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                Position here = new Position(x, y);
+                if (y < size - 2) {
+                    Position there = new Position(x, y + 2);
+                    if (getValueAt(there) == getValueAt(here)) {
+                        pairs.add(new Pair<Position, Position>(here, there));
+                    }
+                }
+            }
+        }
+        return pairs;
     }
 
-    // private HashSet<Move> findPossible101Moves() {
-    //     HashSet<Move> possibleMoves = new HashSet<Move>();
-    //     possibleMoves.addAll(findPossibleHorizontal101Moves());
-    //     possibleMoves.addAll(findPossibleVertical101Moves());
-    //     return possibleMoves;
-    // }
+    private HashSet<Move> findHorizontal101Moves() throws Exception {
+        HashSet<Move> moves = new HashSet<Move>();
+        HashSet<Pair<Position, Position>> pairs = findHorizontal101Pairs();
+        for (Pair<Position, Position> pair : pairs) {
+            byte value = getPairValue(pair);
+            Position l = pair.getL();
+            if (l.getY() > 0) {
 
-    // private HashSet<Move> findPossibleMoves() {
-    //     HashSet<Move> possibleMoves = new HashSet<Move>();
-    //     possibleMoves.addAll(findPossible110Moves());
-    //     possibleMoves.addAll(findPossible101Moves());
-    //     return possibleMoves;
-    // }
+            }
+            if (l.getY() < size - 1) {
+
+            }
+            Position r = pair.getL();
+        }
+        return moves;
+    }
+
+    /**
+     * Finds possible "101" moves (moves, where a block could be moved inbetween a pair of matching blocks)
+     * @return Set of possible moves
+     * @throws Exception
+     */
+    private HashSet<Move> find101Moves() throws Exception {
+        HashSet<Move> moves = new HashSet<Move>();
+        moves.addAll(findHorizontal101Moves());
+        // moves.addAll(findVertical101Moves());
+        return moves;
+    }
+
+    private HashSet<Move> findMoves() throws Exception {
+        HashSet<Move> moves = new HashSet<Move>();
+        moves.addAll(find110Moves());
+        moves.addAll(find101Moves());
+        return moves;
+    }
 
     /**
      * Recursive deletion function

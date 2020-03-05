@@ -25,10 +25,11 @@ public class DrawPanel extends JPanel implements MouseInputListener {
 		return Color.getHSBColor(value / (float) colors, 1f, 0.5f);
     }
 
-    private void drawField(Field field) {
+    private void drawField(Graphics g, Field field) {
         for (int y = 0; y < field.getSize(); y++) {
             for (int x = 0; x < field.getSize(); x++) {
-                byte value = field.getValueAt(x, y);
+				byte value = field.getValueAt(x, y);
+				Color col = getCellColor(value);
             }
         }
     }
@@ -36,7 +37,7 @@ public class DrawPanel extends JPanel implements MouseInputListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        drawField(frame.getGame().getField());
+        drawField(g, frame.getGame().getField());
     }
 
 	@Override
