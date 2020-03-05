@@ -23,12 +23,24 @@ public class Field {
         }
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public ArrayList<ArrayList<Cell>> getCells() {
+        return cells;
+    }
+
     private Cell getCell(int x, int y) {
         ArrayList<Cell> row = cells.get(y);
         return row.get(x);
     }
 
-    private int getNeighboringMines(Cell cell) {
+    public int getNeighboringMines(Cell cell) {
         int amt = 0;
         Position pos = cell.getPosition();
         for (int i = -1; i <= 1; i++) {
@@ -116,8 +128,6 @@ public class Field {
         if (!cell.isCovered()) return;
 
         cell.uncover();
-
-        System.out.println(this);
 
         if (!cell.isMine() && getNeighboringMines(cell) == 0) {
             Position pos = cell.getPosition();
