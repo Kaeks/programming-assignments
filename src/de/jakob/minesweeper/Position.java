@@ -25,4 +25,13 @@ public class Position {
     public String toString() {
         return String.format("Position: X=%d, Y=%d", x, y);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Position) {
+            Position po = (Position) o;
+            return x == po.getX() && y == po.getY();
+        }
+        return false;
+    }
 }
